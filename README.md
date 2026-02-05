@@ -25,12 +25,28 @@ This project implements a machine learning pipeline to predict customer churn.
     - **Method**: `transform_and_save()` splits data (Train/Test) and applies `OneHotEncoder` (categorical) and `StandardScaler` (numeric).
 - **Output**: Saves processed files (`X_train.csv`, `X_test.csv`, `y_train.csv`, `y_test.csv`) and `preprocessor.pkl` to `transformed_data/`.
 
+### 4. Model Training
+- **Input**: Transformed CSVs from `transformed_data/` (`X_train.csv`, `y_train.csv`, etc.).
+- **Implementation**: `src/model_train.py` contains the `ModelTrainer` class.
+    - **Class**: `ModelTrainer` handles loading data, training a Logistic Regression model, and evaluating performance.
+    - **Method**: `train_and_save()` trains the model, logs metrics (accuracy, classification report), and saves the artifact.
+- **Output**: Saves the trained model to `models/logistic_regression.pkl`.
+
+### 5. Model Prediction
+- **Input**: User input (interactive) or CSV file.
+- **Implementation**: `src/model_prediction.py` contains the `ModelPredictor` class.
+    - **Class**: `ModelPredictor` loads the trained model and preprocessor to make predictions.
+    - **Method**: `predict_one()` predicts churn for a single customer. `predict_csv()` runs batch predictions.
+- **Output**: Prints prediction (Churn/No Churn) and probability. Optionally saves batch results to CSV.
+
 **Usage:**
 Run the pipeline scripts in order:
 ```bash
 python src/data_ingestion.py
 python src/data_validation.py
 python src/data_transformation.py
+python src/model_train.py
+python src/model_prediction.py
 ```
 
 ## Installation & Setup
@@ -66,4 +82,4 @@ DB_TABLE=your_table
 The project includes a robust logging and exception handling mechanism.
 - **Logging**: Implemented in `src.logger`. Logs are stored in `logs/app.log`.
 - **Exception Handling**: Implemented in `src.exception`. A `CustomException` class captures detailed error information including file name and line number.
-- **Integration**: All pipeline stages (`data_ingestion.py`, `data_validation.py`, `data_transformation.py`) utilize these modules to log their progress and handle errors gracefully.
+- **Integration**: All pipeline stages (`data_ingestion.py`, `data_validation.py`, `data_transformation.py`, `model_train.py`, `model_prediction.py`) utilize these modules to log their progress and handle errors gracefully.
