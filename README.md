@@ -61,3 +61,9 @@ DB_NAME=your_db
 DB_SCHEMA=public
 DB_TABLE=your_table
 ```
+
+## Logging and Error Handling
+The project includes a robust logging and exception handling mechanism.
+- **Logging**: Implemented in `src.logger`. Logs are stored in `logs/app.log`.
+- **Exception Handling**: Implemented in `src.exception`. A `CustomException` class captures detailed error information including file name and line number.
+- **Integration**: All pipeline stages (`data_ingestion.py`, `data_validation.py`, `data_transformation.py`) utilize these modules to log their progress and handle errors gracefully.
