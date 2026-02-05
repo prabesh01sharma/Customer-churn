@@ -11,10 +11,26 @@ This project implements a machine learning pipeline to predict customer churn.
     - **Method**: `load_csv_data()` executes the query and saves the file.
 - **Output**: Saves the raw dataset to `data/telco_customer_churn.csv`.
 
+### 2. Data Validation
+- **Input**: Raw CSV from `data/telco_customer_churn.csv`.
+- **Implementation**: `src/data_validation.py` contains the `DataValidation` class.
+    - **Class**: `DataValidation` handles schema validation, cleaning, and preprocessing.
+    - **Method**: `validate_and_save()` executes validation logic (schema check, missing value handling, duplicate removal) and saves the file.
+- **Output**: Saves validated dataset to `validated_data/telco_customer_churn_validated.csv`.
+
+### 3. Data Transformation
+- **Input**: Validated CSV from `validated_data/telco_customer_churn_validated.csv`.
+- **Implementation**: `src/data_transformation.py` contains the `DataTransformation` class.
+    - **Class**: `DataTransformation` handles splitting and feature engineering.
+    - **Method**: `transform_and_save()` splits data (Train/Test) and applies `OneHotEncoder` (categorical) and `StandardScaler` (numeric).
+- **Output**: Saves processed files (`X_train.csv`, `X_test.csv`, `y_train.csv`, `y_test.csv`) and `preprocessor.pkl` to `transformed_data/`.
+
 **Usage:**
-Run the ingestion script directly:
+Run the pipeline scripts in order:
 ```bash
 python src/data_ingestion.py
+python src/data_validation.py
+python src/data_transformation.py
 ```
 
 ## Installation & Setup
@@ -45,3 +61,9 @@ DB_NAME=your_db
 DB_SCHEMA=public
 DB_TABLE=your_table
 ```
+
+## Logging and Error Handling
+The project includes a robust logging and exception handling mechanism.
+- **Logging**: Implemented in `src.logger`. Logs are stored in `logs/app.log`.
+- **Exception Handling**: Implemented in `src.exception`. A `CustomException` class captures detailed error information including file name and line number.
+- **Integration**: All pipeline stages (`data_ingestion.py`, `data_validation.py`, `data_transformation.py`) utilize these modules to log their progress and handle errors gracefully.
