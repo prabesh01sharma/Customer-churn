@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-LOG_FILE = f"{datetime.now().strftime('%m_%d_%Y_%H_%M_%S')}.log"
+LOG_FILE = "app.log"
 
 # consistently find the project root (assuming logger.py is in src/)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent 
