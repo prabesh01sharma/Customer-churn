@@ -1,0 +1,33 @@
+columns:
+  - customerid
+  - gender
+  - seniorcitizen
+  - partner
+  - dependents
+  - tenure
+  - phoneservice
+  - multiplelines
+  - internetservice
+  - onlinesecurity
+  - onlinebackup
+  - deviceprotection
+  - techsupport
+  - streamingtv
+  - streamingmovies
+  - contract
+  - paperlessbilling
+  - paymentmethod
+  - monthlycharges
+  - totalcharges
+  - churn
+
+drop_columns:
+  - customerid
+
+numeric_columns:
+  - seniorcitizen
+  - tenure
+  - monthlycharges
+  - totalcharges
+
+target_column: churn
