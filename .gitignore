@@ -211,3 +211,4 @@ __marimo__/
 /transformed_data
 /logs
 /.DS_Store
+models/

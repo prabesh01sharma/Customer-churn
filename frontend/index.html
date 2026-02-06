@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Churn Predictor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-control {
+            padding: 0.75rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: var(--bg-primary);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-control:hover {
+            border-color: var(--text-secondary);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border);
+        }
+
+        .btn-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-actions .btn {
+            flex: 1;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+            border: 2px solid var(--border);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .result-status {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value.churn-yes {
+            color: var(--danger);
+        }
+
+        .result-value.churn-no {
+            color: var(--success);
+        }
+
+        .result-hint {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .probability-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .probability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--warning), var(--danger));
+            transition: width 0.5s ease;
+            border-radius: 6px;
+        }
+
+        .probability-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .raw-output {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .management-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .management-card .card-header {
+            border-bottom-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .management-card .card-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .management-card .card-title {
+            color: white;
+        }
+
+        .management-card p {
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+        }
+
+        .management-card .btn {
+            background: white;
+            color: var(--primary);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 700px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+        }
+
+        .modal-header {
+            padding: 2rem;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+
+        .metrics-table th,
+        .metrics-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .metrics-table th {
+            background: var(--bg-primary);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        .metrics-table td {
+            font-weight: 500;
+        }
+
+        .metric-change {
+            font-weight: 600;
+        }
+
+        .metric-change.positive {
+            color: var(--success);
+        }
+
+        .metric-change.negative {
+            color: var(--danger);
+        }
+
+        .metric-change.neutral {
+            color: var(--text-secondary);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .spacer {
+            height: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔮 Customer Churn Predictor</h1>
+            <p>AI-powered prediction system to identify at-risk customers</p>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Input Form Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📝</div>
+                    <h2 class="card-title">Customer Information</h2>
+                </div>
+
+                <form id="predictionForm">
+                    <div class="form-grid" id="formFields"></div>
+
+                    <div class="btn-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <span>🔍</span> Predict Churn
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                            <span>🔄</span> Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <h2 class="card-title">Prediction Results</h2>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-status">Churn Prediction</div>
+                    <div class="result-value" id="statusResult">—</div>
+                    <div class="result-hint" id="statusHint">Awaiting prediction...</div>
+
+                    <div class="result-status">Churn Probability</div>
+                    <div class="probability-bar">
+                        <div class="probability-fill" id="probabilityBar" style="width: 0%"></div>
+                    </div>
+                    <div class="probability-value" id="probResult">0%</div>
+                </div>
+
+                <div style="margin-top: 1.5rem;">
+                    <div class="result-status">Raw Response</div>
+                    <pre class="raw-output" id="rawResult">{}</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Management Card -->
+        <div class="card management-card">
+            <div class="card-header">
+                <div class="card-icon">⚙️</div>
+                <h2 class="card-title">Model Management</h2>
+            </div>
+            <p>Retrain the prediction model with the latest data to maintain accuracy and improve performance</p>
+            <button id="trainBtn" class="btn">
+                <span>🔄</span> Train Model
+            </button>
+        </div>
+    </div>
+
+    <!-- Training Results Modal -->
+    <div id="trainingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="card-icon">📈</div>
+                <h2 class="card-title">Training Results</h2>
+            </div>
+            <div class="modal-body" id="trainingResults"></div>
+            <div style="padding: 0 2rem 2rem;">
+                <button onclick="closeTrainingModal()" class="btn btn-secondary" style="width: 100%;">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const OPTIONS = {
+            gender: ["Male", "Female"],
+            seniorcitizen: ["No", "Yes"],
+            partner: ["Yes", "No"],
+            dependents: ["Yes", "No"],
+            phoneservice: ["Yes", "No"],
+            multiplelines: ["No", "Yes", "No phone service"],
+            internetservice: ["DSL", "Fiber optic", "No"],
+            onlinesecurity: ["No", "Yes", "No internet service"],
+            onlinebackup: ["No", "Yes", "No internet service"],
+            deviceprotection: ["No", "Yes", "No internet service"],
+            techsupport: ["No", "Yes", "No internet service"],
+            streamingtv: ["No", "Yes", "No internet service"],
+            streamingmovies: ["No", "Yes", "No internet service"],
+            contract: ["Month-to-month", "One year", "Two year"],
+            paperlessbilling: ["Yes", "No"],
+            paymentmethod: ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"]
+        };
+
+        const NUMERIC_FIELDS = ["tenure", "monthlycharges", "totalcharges"];
+
+        const FIELD_ORDER = [
+            "gender", "seniorcitizen", "partner", "dependents", "tenure",
+            "phoneservice", "multiplelines", "internetservice",
+            "onlinesecurity", "onlinebackup", "deviceprotection", "techsupport",
+            "streamingtv", "streamingmovies", "contract", "paperlessbilling",
+            "paymentmethod", "monthlycharges", "totalcharges"
+        ];
+
+        // Build form
+        function buildForm() {
+            const container = document.getElementById("formFields");
+
+            FIELD_ORDER.forEach(field => {
+                const group = document.createElement("div");
+                group.className = "form-group";
+
+                const label = document.createElement("label");
+                label.className = "form-label";
+                label.textContent = field.replace(/([A-Z])/g, ' $1').trim();
+                label.htmlFor = field;
+
+                let input;
+                if (OPTIONS[field]) {
+                    input = document.createElement("select");
+                    input.className = "form-control";
+                    input.id = field;
+                    input.name = field;
+                    input.required = true;
+
+                    const placeholder = document.createElement("option");
+                    placeholder.value = "";
+                    placeholder.textContent = "Select...";
+                    placeholder.disabled = true;
+                    placeholder.selected = true;
+                    input.appendChild(placeholder);
+
+                    OPTIONS[field].forEach(opt => {
+                        const option = document.createElement("option");
+                        option.value = opt;
+                        option.textContent = opt;
+                        input.appendChild(option);
+                    });
+                } else {
+                    input = document.createElement("input");
+                    input.className = "form-control";
+                    input.type = "number";
+                    input.id = field;
+                    input.name = field;
+                    input.step = field === "tenure" ? "1" : "0.01";
+                    input.min = "0";
+                    input.required = true;
+                    input.placeholder = "Enter " + field;
+                }
+
+                group.appendChild(label);
+                group.appendChild(input);
+                container.appendChild(group);
+            });
+        }
+
+        // Handle form submission
+        document.getElementById("predictionForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+
+            try {
+                btn.innerHTML = '<span>⏳</span> Predicting...';
+                btn.disabled = true;
+
+                const formData = new FormData(e.target);
+                const features = {};
+
+                formData.forEach((value, key) => {
+                    if (key === "seniorcitizen") {
+                        features[key] = value === "Yes" ? 1 : 0;
+                    } else if (NUMERIC_FIELDS.includes(key)) {
+                        features[key] = parseFloat(value);
+                    } else {
+                        features[key] = value;
+                    }
+                });
+
+                const response = await fetch("/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ features })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || "Prediction failed");
+                }
+
+                const result = await response.json();
+                displayResults(result);
+
+            } catch (error) {
+                document.getElementById("statusResult").textContent = "Error";
+                document.getElementById("statusHint").textContent = error.message;
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        function displayResults(data) {
+            const isChurn = data.prediction === 1;
+            const statusEl = document.getElementById("statusResult");
+            const probability = data.probability_churn * 100;
+
+            statusEl.textContent = isChurn ? "Yes" : "No";
+            statusEl.className = "result-value " + (isChurn ? "churn-yes" : "churn-no");
+
+            document.getElementById("statusHint").textContent = isChurn
+                ? "⚠️ This customer is at high risk of churning"
+                : "✓ This customer is likely to remain loyal";
+
+            document.getElementById("probabilityBar").style.width = probability + "%";
+            document.getElementById("probResult").textContent = probability.toFixed(2) + "%";
+            document.getElementById("rawResult").textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function trainModel() {
+            const btn = document.getElementById("trainBtn");
+            const originalText = btn.innerHTML;
+
+            try {
+                btn.innerHTML = '<span>⏳</span> Training...';
+                btn.disabled = true;
+
+                const response = await fetch("/retrain", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || "Training failed");
+                }
+
+                const result = await response.json();
+                displayTrainingResults(result);
+
+            } catch (error) {
+                alert("Training error: " + error.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function displayTrainingResults(data) {
+            const resultsDiv = document.getElementById("trainingResults");
+            let html = "";
+
+            if (data.status === "error") {
+                html = `<div class="alert alert-error">❌ Error: ${data.message}</div>`;
+            } else {
+                const comparison = data.comparison_result;
+                const replaced = data.model_replaced;
+
+                html += `<div class="alert ${replaced ? 'alert-success' : 'alert-info'}">`;
+                html += replaced ? '✅ Model Replaced Successfully' : 'ℹ️ Model Not Replaced';
+                html += `</div>`;
+
+                html += `<p style="margin-bottom: 1rem;"><strong>Reason:</strong> ${comparison.reason || "N/A"}</p>`;
+
+                if (comparison.old_metrics && comparison.new_metrics) {
+                    html += `<table class="metrics-table">`;
+                    html += `<thead><tr>`;
+                    html += `<th>Metric</th><th>Old Model</th><th>New Model</th><th>Change</th>`;
+                    html += `</tr></thead><tbody>`;
+
+                    const metrics = ["accuracy", "recall", "precision", "f1"];
+                    metrics.forEach(metric => {
+                        const old = comparison.old_metrics[metric];
+                        const newVal = comparison.new_metrics[metric];
+                        const diff = newVal - old;
+                        const className = diff > 0 ? "positive" : diff < 0 ? "negative" : "neutral";
+                        const arrow = diff > 0 ? "↑" : diff < 0 ? "↓" : "→";
+
+                        html += `<tr>`;
+                        html += `<td style="text-transform: capitalize;">${metric}</td>`;
+                        html += `<td>${(old * 100).toFixed(2)}%</td>`;
+                        html += `<td>${(newVal * 100).toFixed(2)}%</td>`;
+                        html += `<td class="metric-change ${className}">${arrow} ${(Math.abs(diff) * 100).toFixed(2)}%</td>`;
+                        html += `</tr>`;
+                    });
+
+                    html += `</tbody></table>`;
+                }
+            }
+
+            resultsDiv.innerHTML = html;
+            document.getElementById("trainingModal").classList.add("active");
+        }
+
+        function closeTrainingModal() {
+            document.getElementById("trainingModal").classList.remove("active");
+        }
+
+        function resetForm() {
+            document.getElementById("predictionForm").reset();
+            document.getElementById("statusResult").textContent = "—";
+            document.getElementById("statusResult").className = "result-value";
+            document.getElementById("statusHint").textContent = "Awaiting prediction...";
+            document.getElementById("probabilityBar").style.width = "0%";
+            document.getElementById("probResult").textContent = "0%";
+            document.getElementById("rawResult").textContent = "{}";
+        }
+
+        // Initialize
+        buildForm();
+        document.getElementById("trainBtn").addEventListener("click", trainModel);
+    </script>
+</body>
+
+</html>
