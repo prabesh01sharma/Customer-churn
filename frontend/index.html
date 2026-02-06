@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Churn Predictor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            color: var(--text-primary);
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-transform: capitalize;
+        }
+
+        input,
+        select {
+            padding: 0.625rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            background: #fff;
+            color: var(--text-primary);
+            transition: border-color 0.15s, box-shadow 0.15s;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        input.invalid {
+            border-color: var(--danger);
+        }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 0.75rem;
+            display: none;
+        }
+
+        .actions {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-start;
+        }
+
+        button {
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        /* Results Card */
+        .result-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .result-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .result-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .result-value.churn-yes {
+            color: var(--danger);
+        }
+
+        .result-value.churn-no {
+            color: var(--success);
+        }
+
+        .hint-text {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        pre {
+            background: #f1f5f9;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            font-size: 0.75rem;
+            overflow-x: auto;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Customer Churn Predictor</h1>
+            <p class="subtitle">Enter customer details to predict churn probability.</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Input Form -->
+            <div class="card">
+                <form id="churnForm">
+                    <div class="form-grid" id="formGrid">
+                        <!-- JS will populate feature inputs here -->
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn-primary">Predict Churn</button>
+                        <button type="button" class="btn-secondary" id="fillExample">Fill Example</button>
+                        <button type="button" class="btn-secondary" id="resetForm">Reset</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="card">
+                <div class="result-item">
+                    <div class="result-label">Prediction Status</div>
+                    <div class="result-value" id="statusResult">—</div>
+                    <div class="hint-text" id="statusHint">Awaiting input...</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Churn Probability</div>
+                    <div class="result-value" id="probResult">—</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Raw Output</div>
+                    <pre id="rawResult">{}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * 1. Configuration:
+         * We define the explicit order and types for fields.
+         * 'options' handles categorical dropdowns.
+         * 'numeric' handles strictly numeric fields.
+         */
+
+        // Mappings for Categorical fields
+        const OPTIONS = {
+            gender: ["Male", "Female"],
+            seniorcitizen: ["No", "Yes"], // SeniorCitizen mapped to 0/1 properly
+            partner: ["Yes", "No"],
+            dependents: ["Yes", "No"],
+            phoneservice: ["Yes", "No"],
+            multiplelines: ["No", "Yes", "No phone service"],
+            internetservice: ["DSL", "Fiber optic", "No"],
+            onlinesecurity: ["No", "Yes", "No internet service"],
+            onlinebackup: ["No", "Yes", "No internet service"],
+            deviceprotection: ["No", "Yes", "No internet service"],
+            techsupport: ["No", "Yes", "No internet service"],
+            streamingtv: ["No", "Yes", "No internet service"],
+            streamingmovies: ["No", "Yes", "No internet service"],
+            contract: ["Month-to-month", "One year", "Two year"],
+            paperlessbilling: ["Yes", "No"],
+            paymentmethod: [
+                "Electronic check",
+                "Mailed check",
+                "Bank transfer (automatic)",
+                "Credit card (automatic)"
+            ]
+        };
+
+        // Fields deemed numeric
+        const NUMERIC_FIELDS = ["tenure", "monthlycharges", "totalcharges"];
+
+        // Explicit display order matching dataset column order (excluding customerid and churn)
+        const FIELD_ORDER = [
+            "gender", "seniorcitizen", "partner", "dependents", "tenure",
+            "phoneservice", "multiplelines", "internetservice",
+            "onlinesecurity", "onlinebackup", "deviceprotection", "techsupport",
+            "streamingtv", "streamingmovies", "contract", "paperlessbilling",
+            "paymentmethod", "monthlycharges", "totalcharges"
+        ];
+
+        // Example data for quickfill
+        const EXAMPLE_DATA = {
+            gender: "Female",
+            seniorcitizen: "No", // Form uses "No" -> converts to 0
+            partner: "Yes",
+            dependents: "No",
+            tenure: 24,
+            phoneservice: "Yes",
+            multiplelines: "Yes",
+            internetservice: "DSL",
+            onlinesecurity: "Yes",
+            onlinebackup: "Yes",
+            deviceprotection: "Yes",
+            techsupport: "Yes",
+            streamingtv: "Yes",
+            streamingmovies: "Yes",
+            contract: "One year",
+            paperlessbilling: "Yes",
+            paymentmethod: "Mailed check",
+            monthlycharges: 84.80,
+            totalcharges: 1990.50
+        };
+
+        async function init() {
+            try {
+                // Fetch features from API
+                const res = await fetch("/required-features");
+                if (!res.ok) throw new Error("Could not load required features from backend.");
+                const data = await res.json();
+                const features = data.required_features || [];
+
+                createForm(features);
+
+            } catch (err) {
+                console.error(err);
+                document.querySelector(".container").innerHTML = `<div style="text-align:center; color:red; margin-top:50px;">
+                    <h3>Error loading application</h3>
+                    <p>Make sure the backend is running at ${window.location.origin}</p>
+                    <p>${err.message}</p>
+                </div>`;
+            }
+        }
+
+        function createForm(features) {
+            const grid = document.getElementById("formGrid");
+            grid.innerHTML = "";
+
+            // Organize features by our preferred order, append any extras at the end
+            const featureSet = new Set(features);
+            const sortedFeatures = FIELD_ORDER.filter(f => featureSet.has(f));
+            features.forEach(f => {
+                if (!sortedFeatures.includes(f)) sortedFeatures.push(f);
+            });
+
+            sortedFeatures.forEach(field => {
+                const group = document.createElement("div");
+                group.className = "form-group";
+
+                const label = document.createElement("label");
+                label.htmlFor = field;
+                // Prettify label (seniorcitizen -> Senior Citizen)
+                label.textContent = field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                group.appendChild(label);
+
+                let input;
+
+                if (NUMERIC_FIELDS.includes(field)) {
+                    input = document.createElement("input");
+                    input.type = "number";
+                    input.id = field;
+                    input.name = field;
+                    input.min = "0"; // HTML5 Validation
+                    input.step = (field === "tenure") ? "1" : "0.01";
+                    input.placeholder = "0";
+                    input.required = true;
+                } else if (OPTIONS[field]) {
+                    input = document.createElement("select");
+                    input.id = field;
+                    input.name = field;
+                    OPTIONS[field].forEach(opt => {
+                        const option = document.createElement("option");
+                        option.value = opt;
+                        option.textContent = opt;
+                        input.appendChild(option);
+                    });
+                } else {
+                    // Fallback
+                    input = document.createElement("input");
+                    input.type = "text";
+                    input.id = field;
+                    input.name = field;
+                }
+
+                // Error message container for this field
+                const errorSpan = document.createElement("span");
+                errorSpan.className = "error-msg";
+                errorSpan.id = `${field}-error`;
+                errorSpan.textContent = "Invalid value";
+
+                group.appendChild(input);
+                group.appendChild(errorSpan);
+                grid.appendChild(group);
+            });
+        }
+
+        // --- Event Handlers ---
+
+        document.getElementById("fillExample").addEventListener("click", () => {
+            Object.entries(EXAMPLE_DATA).forEach(([key, val]) => {
+                const el = document.getElementById(key);
+                if (el) el.value = val;
+            });
+        });
+
+        document.getElementById("resetForm").addEventListener("click", () => {
+            document.getElementById("churnForm").reset();
+            resetResults();
+        });
+
+        document.getElementById("churnForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            if (!validateForm()) return;
+
+            const formData = new FormData(e.target);
+            const data = {};
+
+            // Convert types
+            for (let [key, val] of formData.entries()) {
+                if (NUMERIC_FIELDS.includes(key)) {
+                    data[key] = parseFloat(val);
+                } else if (key === "seniorcitizen") {
+                    // Map "Yes" -> 1, "No" -> 0
+                    data[key] = val === "Yes" ? 1 : 0;
+                } else {
+                    data[key] = val;
+                }
+            }
+
+            // Submit
+            await submitPrediction(data);
+        });
+
+        function validateForm() {
+            let isValid = true;
+            // Clear previous errors
+            document.querySelectorAll(".error-msg").forEach(el => el.style.display = "none");
+            document.querySelectorAll("input").forEach(el => el.classList.remove("invalid"));
+
+            // Validate Numerics
+            NUMERIC_FIELDS.forEach(field => {
+                const el = document.getElementById(field);
+                if (el) {
+                    const val = parseFloat(el.value);
+                    if (isNaN(val) || val < 0) {
+                        showError(field, "Value cannot be negative.");
+                        isValid = false;
+                    }
+                }
+            });
+
+            return isValid;
+        }
+
+        function showError(fieldId, msg) {
+            const el = document.getElementById(fieldId);
+            const err = document.getElementById(`${fieldId}-error`);
+            if (el) el.classList.add("invalid");
+            if (err) {
+                err.textContent = msg;
+                err.style.display = "block";
+            }
+        }
+
+        async function submitPrediction(features) {
+            const btn = document.querySelector("button[type='submit']");
+            const originalText = btn.textContent;
+            btn.textContent = "Predicting...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch("/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ features })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                displayResults(result);
+
+            } catch (error) {
+                document.getElementById("statusResult").textContent = "Error";
+                document.getElementById("statusHint").textContent = error.message;
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            const isChurn = data.prediction === 1;
+            const statusEl = document.getElementById("statusResult");
+
+            statusEl.textContent = isChurn ? "Yes" : "No";
+            statusEl.className = "result-value " + (isChurn ? "churn-yes" : "churn-no");
+
+            document.getElementById("statusHint").textContent = isChurn
+                ? "This customer is likely to leave."
+                : "This customer is likely to stay.";
+
+            document.getElementById("probResult").textContent = (data.probability_churn * 100).toFixed(2) + "%";
+            document.getElementById("rawResult").textContent = JSON.stringify(data, null, 2);
+        }
+
+        function resetResults() {
+            document.getElementById("statusResult").textContent = "—";
+            document.getElementById("statusResult").className = "result-value";
+            document.getElementById("statusHint").textContent = "Awaiting input...";
+            document.getElementById("probResult").textContent = "—";
+            document.getElementById("rawResult").textContent = "{}";
+        }
+
+        // Initialize App
+        init();
+
+    </script>
+</body>
+
+</html>

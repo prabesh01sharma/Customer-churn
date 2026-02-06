@@ -56,8 +56,8 @@ class ModelTrainer:
             X_train, X_test, y_train, y_test = self._load_transformed_data()
 
             # Logistic Regression (baseline)
-            logging.info("Initializing LogisticRegression model")
-            model = LogisticRegression(max_iter=3000, random_state=self.random_state)
+            logging.info("Initializing LogisticRegression model with balanced class weights")
+            model = LogisticRegression(max_iter=3000, random_state=self.random_state, class_weight='balanced')
             
             logging.info("Training the model")
             model.fit(X_train, y_train)
