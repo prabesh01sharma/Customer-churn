@@ -5,11 +5,13 @@ from pathlib import Path
 import pickle
 import yaml
 import pandas as pd
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.schemas import PredictRequest, PredictResponse
+from app.retrain import ModelRetrainer
 from src.logger import logging
 from src.exception import CustomException
 
@@ -122,4 +124,38 @@ def predict(req: PredictRequest):
         raise
     except Exception as e:
         logging.error(f"Prediction failed: {e}")
-        raise HTTPException(status_code=500, detail="Prediction failed. Check logs.")
+        raise HTTPException(status_code=500, detail=f"Prediction error: {e}")
+
+
+@app.post("/retrain")
+async def retrain_model():
+    """
+    Endpoint to trigger model retraining pipeline.
+    
+    Runs:
+    1. Data ingestion
+    2. Data validation
+    3. Data transformation
+    4. Model training
+    5. Model comparison and replacement (if better)
+    
+    Returns comparison results and status.
+    """
+    try:
+        logging.info("Received model retraining request")
+        
+        # Execute retraining
+        retrainer = ModelRetrainer()
+        result = retrainer.execute_retraining()
+        
+        # Reload model and preprocessor if replaced
+        if result.get("model_replaced"):
+            global MODEL, PREPROCESSOR
+            MODEL, PREPROCESSOR = load_model_and_preprocessor()
+            logging.info("Model and preprocessor reloaded successfully")
+        
+        return result
+        
+    except Exception as e:
+        logging.error(f"Retraining failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Retraining error: {e}")

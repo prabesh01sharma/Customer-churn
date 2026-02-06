@@ -2,192 +2,242 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Churn Predictor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
             --text-primary: #1e293b;
             --text-secondary: #64748b;
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
             --border: #e2e8f0;
-            --danger: #ef4444;
-            --success: #22c55e;
-            --radius: 8px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
         }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
             color: var(--text-primary);
-            line-height: 1.5;
-            margin: 0;
-            padding: 2rem;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
-        header {
+        .header {
             text-align: center;
             margin-bottom: 2rem;
+            color: white;
         }
 
-        h1 {
-            font-size: 2rem;
+        .header h1 {
+            font-size: 2.5rem;
             font-weight: 700;
-            margin: 0 0 0.5rem 0;
-            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 1rem;
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            font-weight: 300;
         }
 
         .main-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 2rem;
-            align-items: start;
+            margin-bottom: 2rem;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .main-grid {
                 grid-template-columns: 1fr;
             }
         }
 
         .card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 1.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
         }
 
-        label {
+        .form-label {
             font-size: 0.875rem;
             font-weight: 500;
-            color: var(--text-primary);
-            text-transform: capitalize;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        input,
-        select {
-            padding: 0.625rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 0.875rem;
-            background: #fff;
-            color: var(--text-primary);
-            transition: border-color 0.15s, box-shadow 0.15s;
+        .form-control {
+            padding: 0.75rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: var(--bg-primary);
+        }
+
+        .form-control:focus {
             outline: none;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        input:focus,
-        select:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
 
-        input.invalid {
-            border-color: var(--danger);
+        .form-control:hover {
+            border-color: var(--text-secondary);
         }
 
-        .error-msg {
-            color: var(--danger);
-            font-size: 0.75rem;
-            display: none;
-        }
-
-        .actions {
-            margin-top: 2rem;
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-start;
-        }
-
-        button {
-            padding: 0.625rem 1.25rem;
-            border-radius: var(--radius);
-            font-weight: 500;
-            font-size: 0.875rem;
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            border: none;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .btn-primary {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
         }
 
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-        }
-
         .btn-secondary {
-            background-color: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-        }
-
-        .btn-secondary:hover {
-            background-color: #f1f5f9;
+            background: var(--bg-primary);
             color: var(--text-primary);
+            border: 1.5px solid var(--border);
         }
 
-        /* Results Card */
-        .result-item {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border);
+        .btn-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
 
-        .result-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
+        .btn-actions .btn {
+            flex: 1;
         }
 
-        .result-label {
-            font-size: 0.75rem;
+        .result-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+            border: 2px solid var(--border);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .result-status {
+            font-size: 0.875rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
             color: var(--text-secondary);
             margin-bottom: 0.5rem;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .result-value {
-            font-size: 1.25rem;
+            font-size: 3rem;
             font-weight: 700;
-            color: var(--text-primary);
+            margin-bottom: 0.5rem;
         }
 
         .result-value.churn-yes {
@@ -198,79 +248,280 @@
             color: var(--success);
         }
 
-        .hint-text {
-            font-size: 0.875rem;
+        .result-hint {
+            font-size: 0.95rem;
             color: var(--text-secondary);
-            margin-top: 0.25rem;
+            margin-bottom: 1.5rem;
         }
 
-        pre {
-            background: #f1f5f9;
-            padding: 0.75rem;
-            border-radius: var(--radius);
-            font-size: 0.75rem;
+        .probability-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .probability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--warning), var(--danger));
+            transition: width 0.5s ease;
+            border-radius: 6px;
+        }
+
+        .probability-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .raw-output {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
             overflow-x: auto;
-            margin: 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .management-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .management-card .card-header {
+            border-bottom-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .management-card .card-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .management-card .card-title {
+            color: white;
+        }
+
+        .management-card p {
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+        }
+
+        .management-card .btn {
+            background: white;
+            color: var(--primary);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 700px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+        }
+
+        .modal-header {
+            padding: 2rem;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+
+        .metrics-table th,
+        .metrics-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .metrics-table th {
+            background: var(--bg-primary);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        .metrics-table td {
+            font-weight: 500;
+        }
+
+        .metric-change {
+            font-weight: 600;
+        }
+
+        .metric-change.positive {
+            color: var(--success);
+        }
+
+        .metric-change.negative {
+            color: var(--danger);
+        }
+
+        .metric-change.neutral {
+            color: var(--text-secondary);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .spacer {
+            height: 2rem;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <header>
-            <h1>Customer Churn Predictor</h1>
-            <p class="subtitle">Enter customer details to predict churn probability.</p>
-        </header>
+        <!-- Header -->
+        <div class="header">
+            <h1>🔮 Customer Churn Predictor</h1>
+            <p>AI-powered prediction system to identify at-risk customers</p>
+        </div>
 
+        <!-- Main Grid -->
         <div class="main-grid">
-            <!-- Input Form -->
+            <!-- Input Form Card -->
             <div class="card">
-                <form id="churnForm">
-                    <div class="form-grid" id="formGrid">
-                        <!-- JS will populate feature inputs here -->
-                    </div>
+                <div class="card-header">
+                    <div class="card-icon">📝</div>
+                    <h2 class="card-title">Customer Information</h2>
+                </div>
 
-                    <div class="actions">
-                        <button type="submit" class="btn-primary">Predict Churn</button>
-                        <button type="button" class="btn-secondary" id="fillExample">Fill Example</button>
-                        <button type="button" class="btn-secondary" id="resetForm">Reset</button>
+                <form id="predictionForm">
+                    <div class="form-grid" id="formFields"></div>
+
+                    <div class="btn-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <span>🔍</span> Predict Churn
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                            <span>🔄</span> Reset
+                        </button>
                     </div>
                 </form>
             </div>
 
-            <!-- Results Panel -->
+            <!-- Results Card -->
             <div class="card">
-                <div class="result-item">
-                    <div class="result-label">Prediction Status</div>
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <h2 class="card-title">Prediction Results</h2>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-status">Churn Prediction</div>
                     <div class="result-value" id="statusResult">—</div>
-                    <div class="hint-text" id="statusHint">Awaiting input...</div>
+                    <div class="result-hint" id="statusHint">Awaiting prediction...</div>
+
+                    <div class="result-status">Churn Probability</div>
+                    <div class="probability-bar">
+                        <div class="probability-fill" id="probabilityBar" style="width: 0%"></div>
+                    </div>
+                    <div class="probability-value" id="probResult">0%</div>
                 </div>
 
-                <div class="result-item">
-                    <div class="result-label">Churn Probability</div>
-                    <div class="result-value" id="probResult">—</div>
+                <div style="margin-top: 1.5rem;">
+                    <div class="result-status">Raw Response</div>
+                    <pre class="raw-output" id="rawResult">{}</pre>
                 </div>
+            </div>
+        </div>
 
-                <div class="result-item">
-                    <div class="result-label">Raw Output</div>
-                    <pre id="rawResult">{}</pre>
-                </div>
+        <!-- Model Management Card -->
+        <div class="card management-card">
+            <div class="card-header">
+                <div class="card-icon">⚙️</div>
+                <h2 class="card-title">Model Management</h2>
+            </div>
+            <p>Retrain the prediction model with the latest data to maintain accuracy and improve performance</p>
+            <button id="trainBtn" class="btn">
+                <span>🔄</span> Train Model
+            </button>
+        </div>
+    </div>
+
+    <!-- Training Results Modal -->
+    <div id="trainingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="card-icon">📈</div>
+                <h2 class="card-title">Training Results</h2>
+            </div>
+            <div class="modal-body" id="trainingResults"></div>
+            <div style="padding: 0 2rem 2rem;">
+                <button onclick="closeTrainingModal()" class="btn btn-secondary" style="width: 100%;">
+                    Close
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        /**
-         * 1. Configuration:
-         * We define the explicit order and types for fields.
-         * 'options' handles categorical dropdowns.
-         * 'numeric' handles strictly numeric fields.
-         */
-
-        // Mappings for Categorical fields
+        // Configuration
         const OPTIONS = {
             gender: ["Male", "Female"],
-            seniorcitizen: ["No", "Yes"], // SeniorCitizen mapped to 0/1 properly
+            seniorcitizen: ["No", "Yes"],
             partner: ["Yes", "No"],
             dependents: ["Yes", "No"],
             phoneservice: ["Yes", "No"],
@@ -284,18 +535,11 @@
             streamingmovies: ["No", "Yes", "No internet service"],
             contract: ["Month-to-month", "One year", "Two year"],
             paperlessbilling: ["Yes", "No"],
-            paymentmethod: [
-                "Electronic check",
-                "Mailed check",
-                "Bank transfer (automatic)",
-                "Credit card (automatic)"
-            ]
+            paymentmethod: ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"]
         };
 
-        // Fields deemed numeric
         const NUMERIC_FIELDS = ["tenure", "monthlycharges", "totalcharges"];
 
-        // Explicit display order matching dataset column order (excluding customerid and churn)
         const FIELD_ORDER = [
             "gender", "seniorcitizen", "partner", "dependents", "tenure",
             "phoneservice", "multiplelines", "internetservice",
@@ -304,85 +548,34 @@
             "paymentmethod", "monthlycharges", "totalcharges"
         ];
 
-        // Example data for quickfill
-        const EXAMPLE_DATA = {
-            gender: "Female",
-            seniorcitizen: "No", // Form uses "No" -> converts to 0
-            partner: "Yes",
-            dependents: "No",
-            tenure: 24,
-            phoneservice: "Yes",
-            multiplelines: "Yes",
-            internetservice: "DSL",
-            onlinesecurity: "Yes",
-            onlinebackup: "Yes",
-            deviceprotection: "Yes",
-            techsupport: "Yes",
-            streamingtv: "Yes",
-            streamingmovies: "Yes",
-            contract: "One year",
-            paperlessbilling: "Yes",
-            paymentmethod: "Mailed check",
-            monthlycharges: 84.80,
-            totalcharges: 1990.50
-        };
+        // Build form
+        function buildForm() {
+            const container = document.getElementById("formFields");
 
-        async function init() {
-            try {
-                // Fetch features from API
-                const res = await fetch("/required-features");
-                if (!res.ok) throw new Error("Could not load required features from backend.");
-                const data = await res.json();
-                const features = data.required_features || [];
-
-                createForm(features);
-
-            } catch (err) {
-                console.error(err);
-                document.querySelector(".container").innerHTML = `<div style="text-align:center; color:red; margin-top:50px;">
-                    <h3>Error loading application</h3>
-                    <p>Make sure the backend is running at ${window.location.origin}</p>
-                    <p>${err.message}</p>
-                </div>`;
-            }
-        }
-
-        function createForm(features) {
-            const grid = document.getElementById("formGrid");
-            grid.innerHTML = "";
-
-            // Organize features by our preferred order, append any extras at the end
-            const featureSet = new Set(features);
-            const sortedFeatures = FIELD_ORDER.filter(f => featureSet.has(f));
-            features.forEach(f => {
-                if (!sortedFeatures.includes(f)) sortedFeatures.push(f);
-            });
-
-            sortedFeatures.forEach(field => {
+            FIELD_ORDER.forEach(field => {
                 const group = document.createElement("div");
                 group.className = "form-group";
 
                 const label = document.createElement("label");
+                label.className = "form-label";
+                label.textContent = field.replace(/([A-Z])/g, ' $1').trim();
                 label.htmlFor = field;
-                // Prettify label (seniorcitizen -> Senior Citizen)
-                label.textContent = field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-                group.appendChild(label);
 
                 let input;
-
-                if (NUMERIC_FIELDS.includes(field)) {
-                    input = document.createElement("input");
-                    input.type = "number";
-                    input.id = field;
-                    input.name = field;
-                    input.min = "0"; // HTML5 Validation
-                    input.step = (field === "tenure") ? "1" : "0.01";
-                    input.placeholder = "0";
-                    input.required = true;
-                } else if (OPTIONS[field]) {
+                if (OPTIONS[field]) {
                     input = document.createElement("select");
+                    input.className = "form-control";
                     input.id = field;
                     input.name = field;
+                    input.required = true;
+
+                    const placeholder = document.createElement("option");
+                    placeholder.value = "";
+                    placeholder.textContent = "Select...";
+                    placeholder.disabled = true;
+                    placeholder.selected = true;
+                    input.appendChild(placeholder);
+
                     OPTIONS[field].forEach(opt => {
                         const option = document.createElement("option");
                         option.value = opt;
@@ -390,100 +583,46 @@
                         input.appendChild(option);
                     });
                 } else {
-                    // Fallback
                     input = document.createElement("input");
-                    input.type = "text";
+                    input.className = "form-control";
+                    input.type = "number";
                     input.id = field;
                     input.name = field;
+                    input.step = field === "tenure" ? "1" : "0.01";
+                    input.min = "0";
+                    input.required = true;
+                    input.placeholder = "Enter " + field;
                 }
 
-                // Error message container for this field
-                const errorSpan = document.createElement("span");
-                errorSpan.className = "error-msg";
-                errorSpan.id = `${field}-error`;
-                errorSpan.textContent = "Invalid value";
-
+                group.appendChild(label);
                 group.appendChild(input);
-                group.appendChild(errorSpan);
-                grid.appendChild(group);
+                container.appendChild(group);
             });
         }
 
-        // --- Event Handlers ---
-
-        document.getElementById("fillExample").addEventListener("click", () => {
-            Object.entries(EXAMPLE_DATA).forEach(([key, val]) => {
-                const el = document.getElementById(key);
-                if (el) el.value = val;
-            });
-        });
-
-        document.getElementById("resetForm").addEventListener("click", () => {
-            document.getElementById("churnForm").reset();
-            resetResults();
-        });
-
-        document.getElementById("churnForm").addEventListener("submit", async (e) => {
+        // Handle form submission
+        document.getElementById("predictionForm").addEventListener("submit", async (e) => {
             e.preventDefault();
-            if (!validateForm()) return;
-
-            const formData = new FormData(e.target);
-            const data = {};
-
-            // Convert types
-            for (let [key, val] of formData.entries()) {
-                if (NUMERIC_FIELDS.includes(key)) {
-                    data[key] = parseFloat(val);
-                } else if (key === "seniorcitizen") {
-                    // Map "Yes" -> 1, "No" -> 0
-                    data[key] = val === "Yes" ? 1 : 0;
-                } else {
-                    data[key] = val;
-                }
-            }
-
-            // Submit
-            await submitPrediction(data);
-        });
-
-        function validateForm() {
-            let isValid = true;
-            // Clear previous errors
-            document.querySelectorAll(".error-msg").forEach(el => el.style.display = "none");
-            document.querySelectorAll("input").forEach(el => el.classList.remove("invalid"));
-
-            // Validate Numerics
-            NUMERIC_FIELDS.forEach(field => {
-                const el = document.getElementById(field);
-                if (el) {
-                    const val = parseFloat(el.value);
-                    if (isNaN(val) || val < 0) {
-                        showError(field, "Value cannot be negative.");
-                        isValid = false;
-                    }
-                }
-            });
-
-            return isValid;
-        }
-
-        function showError(fieldId, msg) {
-            const el = document.getElementById(fieldId);
-            const err = document.getElementById(`${fieldId}-error`);
-            if (el) el.classList.add("invalid");
-            if (err) {
-                err.textContent = msg;
-                err.style.display = "block";
-            }
-        }
-
-        async function submitPrediction(features) {
-            const btn = document.querySelector("button[type='submit']");
-            const originalText = btn.textContent;
-            btn.textContent = "Predicting...";
-            btn.disabled = true;
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
 
             try {
+                btn.innerHTML = '<span>⏳</span> Predicting...';
+                btn.disabled = true;
+
+                const formData = new FormData(e.target);
+                const features = {};
+
+                formData.forEach((value, key) => {
+                    if (key === "seniorcitizen") {
+                        features[key] = value === "Yes" ? 1 : 0;
+                    } else if (NUMERIC_FIELDS.includes(key)) {
+                        features[key] = parseFloat(value);
+                    } else {
+                        features[key] = value;
+                    }
+                });
+
                 const response = await fetch("/predict", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -491,7 +630,8 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API Error: ${response.statusText}`);
+                    const errData = await response.json();
+                    throw new Error(errData.detail || "Prediction failed");
                 }
 
                 const result = await response.json();
@@ -501,37 +641,120 @@
                 document.getElementById("statusResult").textContent = "Error";
                 document.getElementById("statusHint").textContent = error.message;
             } finally {
-                btn.textContent = originalText;
+                btn.innerHTML = originalText;
                 btn.disabled = false;
             }
-        }
+        });
 
         function displayResults(data) {
             const isChurn = data.prediction === 1;
             const statusEl = document.getElementById("statusResult");
+            const probability = data.probability_churn * 100;
 
             statusEl.textContent = isChurn ? "Yes" : "No";
             statusEl.className = "result-value " + (isChurn ? "churn-yes" : "churn-no");
 
             document.getElementById("statusHint").textContent = isChurn
-                ? "This customer is likely to leave."
-                : "This customer is likely to stay.";
+                ? "⚠️ This customer is at high risk of churning"
+                : "✓ This customer is likely to remain loyal";
 
-            document.getElementById("probResult").textContent = (data.probability_churn * 100).toFixed(2) + "%";
+            document.getElementById("probabilityBar").style.width = probability + "%";
+            document.getElementById("probResult").textContent = probability.toFixed(2) + "%";
             document.getElementById("rawResult").textContent = JSON.stringify(data, null, 2);
         }
 
-        function resetResults() {
+        async function trainModel() {
+            const btn = document.getElementById("trainBtn");
+            const originalText = btn.innerHTML;
+
+            try {
+                btn.innerHTML = '<span>⏳</span> Training...';
+                btn.disabled = true;
+
+                const response = await fetch("/retrain", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || "Training failed");
+                }
+
+                const result = await response.json();
+                displayTrainingResults(result);
+
+            } catch (error) {
+                alert("Training error: " + error.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function displayTrainingResults(data) {
+            const resultsDiv = document.getElementById("trainingResults");
+            let html = "";
+
+            if (data.status === "error") {
+                html = `<div class="alert alert-error">❌ Error: ${data.message}</div>`;
+            } else {
+                const comparison = data.comparison_result;
+                const replaced = data.model_replaced;
+
+                html += `<div class="alert ${replaced ? 'alert-success' : 'alert-info'}">`;
+                html += replaced ? '✅ Model Replaced Successfully' : 'ℹ️ Model Not Replaced';
+                html += `</div>`;
+
+                html += `<p style="margin-bottom: 1rem;"><strong>Reason:</strong> ${comparison.reason || "N/A"}</p>`;
+
+                if (comparison.old_metrics && comparison.new_metrics) {
+                    html += `<table class="metrics-table">`;
+                    html += `<thead><tr>`;
+                    html += `<th>Metric</th><th>Old Model</th><th>New Model</th><th>Change</th>`;
+                    html += `</tr></thead><tbody>`;
+
+                    const metrics = ["accuracy", "recall", "precision", "f1"];
+                    metrics.forEach(metric => {
+                        const old = comparison.old_metrics[metric];
+                        const newVal = comparison.new_metrics[metric];
+                        const diff = newVal - old;
+                        const className = diff > 0 ? "positive" : diff < 0 ? "negative" : "neutral";
+                        const arrow = diff > 0 ? "↑" : diff < 0 ? "↓" : "→";
+
+                        html += `<tr>`;
+                        html += `<td style="text-transform: capitalize;">${metric}</td>`;
+                        html += `<td>${(old * 100).toFixed(2)}%</td>`;
+                        html += `<td>${(newVal * 100).toFixed(2)}%</td>`;
+                        html += `<td class="metric-change ${className}">${arrow} ${(Math.abs(diff) * 100).toFixed(2)}%</td>`;
+                        html += `</tr>`;
+                    });
+
+                    html += `</tbody></table>`;
+                }
+            }
+
+            resultsDiv.innerHTML = html;
+            document.getElementById("trainingModal").classList.add("active");
+        }
+
+        function closeTrainingModal() {
+            document.getElementById("trainingModal").classList.remove("active");
+        }
+
+        function resetForm() {
+            document.getElementById("predictionForm").reset();
             document.getElementById("statusResult").textContent = "—";
             document.getElementById("statusResult").className = "result-value";
-            document.getElementById("statusHint").textContent = "Awaiting input...";
-            document.getElementById("probResult").textContent = "—";
+            document.getElementById("statusHint").textContent = "Awaiting prediction...";
+            document.getElementById("probabilityBar").style.width = "0%";
+            document.getElementById("probResult").textContent = "0%";
             document.getElementById("rawResult").textContent = "{}";
         }
 
-        // Initialize App
-        init();
-
+        // Initialize
+        buildForm();
+        document.getElementById("trainBtn").addEventListener("click", trainModel);
     </script>
 </body>
 
